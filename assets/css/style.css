@@ -281,3 +281,81 @@ td {
     text-decoration: none;
     font-size: 13px;
 }
+
+/* Application Form */
+
+.application-form {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 22px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group label {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #e5e3ed;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 13px;
+    background: white;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #7665c9;
+}
+
+.full-width {
+    grid-column: 1 / -1;
+}
+
+.form-actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.form-actions button {
+    border: none;
+    cursor: pointer;
+}
+
+.form-actions a {
+    color: #7665c9;
+    text-decoration: none;
+    font-size: 13px;
+}
+
+.form-errors {
+    background: #fff0f0;
+    color: #b42318;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 13px;
+}
+
+@media (max-width: 600px) {
+    .application-form {
+        grid-template-columns: 1fr;
+    }
+
+    .full-width {
+        grid-column: auto;
+    }
+}
