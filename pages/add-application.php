@@ -1,10 +1,20 @@
-
 <?php
+session_start();
+
 require_once "../config/database.php";
 
-$errors = [];
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
+
+    $submittedToken = $_POST['csrf_token'] ?? '';
+
+    if (!hash_equals($_SESSION['csrf_token'], $submittedToken)) {
+        http_response_code(403);
+        exit("Invalid form submission. Please try again.");
+    }
 
     $company = trim($_POST['company_name'] ?? '');
     $jobTitle = trim($_POST['job_title'] ?? '');
@@ -116,6 +126,11 @@ function e($value) {
         <?php endif; ?>
 
         <form method="POST" class="application-form">
+            <input
+                type="hidden"
+                name="csrf_token"
+                value="<?= e($_SESSION['csrf_token']) ?>"
+            >
 
             <div class="form-group">
                 <label>Company Name *</label>

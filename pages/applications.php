@@ -1,5 +1,9 @@
-
 <?php
+session_start();
+
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
 require_once "../config/database.php";
 
 // Get search input
@@ -151,15 +155,19 @@ function e($value) {
                                     Edit
                                 </a>
 
-                                <form method="POST" action="delete-application.php"
+                                <form method="POST"
+                                    action="delete-application.php"
                                     onsubmit="return confirm('Delete this application?')">
 
-                                    <input type="hidden" name="id" value="<?= e($app['id']) ?>">
+                                    <input type="hidden" name="id"
+                                        value="<?= e($app['id']) ?>">
+
+                                    <input type="hidden" name="csrf_token"
+                                        value="<?= e($_SESSION['csrf_token']) ?>">
 
                                     <button type="submit" class="delete-btn">
                                         Delete
                                     </button>
-
                                 </form>
                             </td>
                         </tr>

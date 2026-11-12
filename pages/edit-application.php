@@ -1,12 +1,20 @@
 
 <?php
+session_start();
+
 require_once "../config/database.php";
+
+// Generate CSRF token
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
 
 // Get application ID
 $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 
 if (!$id || $id <= 0) {
-    die("Invalid application ID.");
+    http_response_code(400);
+    exit("Invalid application ID.");
 }
 
 // Fetch existing application
@@ -18,7 +26,8 @@ $stmt->execute([$id]);
 $application = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$application) {
-    die("Application not found.");
+    http_response_code(404);
+    exit("Application not found.");
 }
 
 // Fetch statuses
@@ -30,6 +39,15 @@ $errors = [];
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
+    // CSRF validation
+    $submittedToken = $_POST['csrf_token'] ?? '';
+
+    if (!hash_equals($_SESSION['csrf_token'], $submittedToken)) {
+        http_response_code(403);
+        exit("Invalid form submission. Please try again.");
+    }
+
+    // Get form values
     $company = trim($_POST['company_name'] ?? '');
     $jobTitle = trim($_POST['job_title'] ?? '');
     $jobType = $_POST['job_type'] ?? '';
@@ -40,6 +58,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $interviewDate = $_POST['interview_date'] ?? '';
     $notes = trim($_POST['notes'] ?? '');
 
+    // Validation
     if ($company === '') {
         $errors[] = "Company name is required.";
     }
@@ -56,6 +75,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $errors[] = "Enter a valid URL.";
     }
 
+    // Validate status ID
+    $validStatusIds = array_column($statuses, 'id');
+
+    if (!in_array((int)$statusId, array_map('intval', $validStatusIds), true)) {
+        $errors[] = "Please select a valid application status.";
+    }
+
+    // Update application
     if (empty($errors)) {
 
         $sql = "
@@ -80,7 +107,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $jobType,
             $location,
             $appliedDate,
-            $statusId,
+            (int)$statusId,
             $jobUrl ?: null,
             $interviewDate ?: null,
             $notes,
@@ -112,6 +139,7 @@ function e($value) {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -142,25 +170,41 @@ function e($value) {
             </div>
         <?php endif; ?>
 
-        <form method="POST" class="application-form">
+        <form
+            method="POST"
+            action="edit-application.php?id=<?= (int)$id ?>"
+            class="application-form"
+        >
+
+            <!-- CSRF Token -->
+            <input
+                type="hidden"
+                name="csrf_token"
+                value="<?= e($_SESSION['csrf_token']) ?>"
+            >
 
             <div class="form-group">
                 <label>Company Name *</label>
                 <input type="text" name="company_name"
-                    value="<?= e($application['company_name']) ?>" required>
+                    value="<?= e($application['company_name']) ?>"
+                    required>
             </div>
 
             <div class="form-group">
                 <label>Job Title *</label>
                 <input type="text" name="job_title"
-                    value="<?= e($application['job_title']) ?>" required>
+                    value="<?= e($application['job_title']) ?>"
+                    required>
             </div>
 
             <div class="form-group">
                 <label>Job Type</label>
                 <select name="job_type">
+                    <option value="">Select Job Type</option>
+
                     <?php
                     $types = ['Full-time', 'Part-time', 'Internship', 'Contract'];
+
                     foreach ($types as $type):
                     ?>
                         <option value="<?= e($type) ?>"
@@ -168,6 +212,7 @@ function e($value) {
                             <?= e($type) ?>
                         </option>
                     <?php endforeach; ?>
+
                 </select>
             </div>
 
@@ -180,18 +225,21 @@ function e($value) {
             <div class="form-group">
                 <label>Applied Date *</label>
                 <input type="date" name="applied_date"
-                    value="<?= e($application['applied_date']) ?>" required>
+                    value="<?= e($application['applied_date']) ?>"
+                    required>
             </div>
 
             <div class="form-group">
                 <label>Status</label>
-                <select name="status_id">
+                <select name="status_id" required>
+
                     <?php foreach ($statuses as $s): ?>
                         <option value="<?= e($s['id']) ?>"
                             <?= $application['status_id'] == $s['id'] ? 'selected' : '' ?>>
                             <?= e($s['status_name']) ?>
                         </option>
                     <?php endforeach; ?>
+
                 </select>
             </div>
 
@@ -213,11 +261,13 @@ function e($value) {
             </div>
 
             <div class="form-actions full-width">
+
                 <button type="submit" class="primary-btn">
                     Update Application
                 </button>
 
                 <a href="applications.php">Cancel</a>
+
             </div>
 
         </form>
