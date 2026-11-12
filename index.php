@@ -246,7 +246,7 @@ function e($value) {
                                 <td><?= e($app['applied_date']) ?></td>
 
                                 <td>
-                                    <span class="status">
+                                    <span class="status status-<?= strtolower(e($app['status_name'])) ?>">
                                         <?= e($app['status_name']) ?>
                                     </span>
                                 </td>
