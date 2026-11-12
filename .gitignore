@@ -1,0 +1,10 @@
+# Environment and credentials
+.env
+config/secrets.php
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
