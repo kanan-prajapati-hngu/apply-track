@@ -359,3 +359,23 @@ td {
         grid-column: auto;
     }
 }
+.delete-btn {
+    border: none;
+    background: #fff0f0;
+    color: #d64545;
+    padding: 7px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.delete-btn:hover {
+    background: #ffe0e0;
+}
+
+td a {
+    color: #7665c9;
+    text-decoration: none;
+    margin-right: 10px;
+    font-size: 12px;
+}

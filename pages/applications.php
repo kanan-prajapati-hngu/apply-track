@@ -125,6 +125,7 @@ function e($value) {
                         <th>Location</th>
                         <th>Applied Date</th>
                         <th>Status</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
 
@@ -145,6 +146,22 @@ function e($value) {
                                     <?= e($app['status_name']) ?>
                                 </span>
                             </td>
+                            <td>
+                                <a href="edit-application.php?id=<?= e($app['id']) ?>">
+                                    Edit
+                                </a>
+
+                                <form method="POST" action="delete-application.php"
+                                    onsubmit="return confirm('Delete this application?')">
+
+                                    <input type="hidden" name="id" value="<?= e($app['id']) ?>">
+
+                                    <button type="submit" class="delete-btn">
+                                        Delete
+                                    </button>
+
+                                </form>
+                            </td>
                         </tr>
 
                     <?php endforeach; ?>
@@ -152,7 +169,7 @@ function e($value) {
                 <?php else: ?>
 
                     <tr>
-                        <td colspan="6">No applications found.</td>
+                        <td colspan="7">No applications found.</td>
                     </tr>
 
                 <?php endif; ?>
