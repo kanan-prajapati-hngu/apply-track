@@ -236,3 +236,48 @@ td {
         grid-template-columns: 1fr;
     }
 }
+
+/* Applications Search and Filter */
+
+.filter-form {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+}
+
+.filter-form input,
+.filter-form select {
+    padding: 12px;
+    border: 1px solid #e5e3ed;
+    border-radius: 8px;
+    font-size: 13px;
+    outline: none;
+}
+
+.filter-form input {
+    flex: 1;
+    min-width: 200px;
+}
+
+.filter-form select {
+    min-width: 150px;
+    background: white;
+}
+
+.filter-form input:focus,
+.filter-form select:focus {
+    border-color: #7665c9;
+}
+
+.filter-form button {
+    border: none;
+    cursor: pointer;
+}
+
+.filter-form a {
+    align-self: center;
+    color: #7665c9;
+    text-decoration: none;
+    font-size: 13px;
+}
